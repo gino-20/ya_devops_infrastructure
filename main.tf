@@ -7,19 +7,11 @@ terraform {
  }
 }
 
-variable "IAM" {
-  type = string
-}
 
-provider "yandex" {
- token     = var.IAM
- cloud_id  = "b1g3jddf4nv5e9okle7p"
- folder_id = "b1gn1o0rpqh2ujqoai1v"
- zone      = "ru-central1-a"
-}
 
 resource "yandex_compute_instance" "vm-1" {
-    name = "chapter5-lesson2-alexey-v-gaydukov"
+    count = 2
+    name = "chapter5-lesson2-alexey-v-gaydukov-${count.index}"
 
     resources {
         cores  = 2
@@ -42,6 +34,3 @@ resource "yandex_compute_instance" "vm-1" {
     }
 }
 
-    output "ip_address" {
-        value = yandex_compute_instance.vm-1.network_interface.0.ip_address
-    }

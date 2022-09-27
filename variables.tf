@@ -1,0 +1,4 @@
+variable "IAM" {
+  type = string
+}
+
