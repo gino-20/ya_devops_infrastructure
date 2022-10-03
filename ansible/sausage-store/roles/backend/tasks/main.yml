@@ -45,7 +45,7 @@
     version: latest
     username: "{{ nexus_user }}"
     password: "{{ nexus_pass }}"
-    owner: jarservice
+    owner: "{{ backend_user }}"
 
 - name: Deploy unit-file template
   template:
