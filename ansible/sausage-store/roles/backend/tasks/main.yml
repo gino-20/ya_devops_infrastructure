@@ -1,0 +1,63 @@
+---
+# tasks file for backend
+- name: Update apt-get repo and cache
+  apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
+
+- name: Upgrade all apt packages
+  apt: upgrade=dist force_apt_get=yes
+
+- name: Install Java package
+  ansible.builtin.package:
+    name: openjdk-16-jdk
+    state: present
+
+- name: Install PIP
+  apt: name=python3-pip state=present
+
+- name: Install lxml
+  pip: name=lxml
+
+- name: Create service user
+  user:
+    name: "{{ backend_user }}"
+    create_home: no
+    shell: /sbin/nologin
+
+- name: Creates application directory
+  file:
+    path: "{{ backend_workdir }}"
+    state: directory
+    owner: "{{ backend_user }}"
+    group: "{{ backend_user }}"
+- name: Creates logs directory
+  file:
+    path: /logs
+    state: directory
+    owner: "{{ backend_user }}"
+    group: "{{ backend_user }}"
+
+- name: Download application package
+  maven_artifact:
+    dest: "{{ backend_workdir }}sausage-store.jar"
+    repository_url: https://nexus.praktikum-services.ru/repository/sausage-store-gaydukov-backend2
+    group_id: "com.yandex.practicum.devops"
+    artifact_id: sausage-store
+    version: latest
+    username: "{{ nexus_user }}"
+    password: "{{ nexus_pass }}"
+    owner: jarservice
+
+- name: Deploy unit-file template
+  template:
+    src: sausage-store-backend.service.j2
+    dest: /etc/systemd/system/sausage-store-backend.service
+
+
+- name: Reload systemd config
+  systemd:
+    daemon_reload: yes
+
+- name: Launch backend service
+  service:
+    name: sausage-store-backend
+    state: started

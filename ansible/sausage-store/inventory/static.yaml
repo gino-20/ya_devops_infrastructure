@@ -1,0 +1,5 @@
+all:
+  children:
+    sausage-store:
+      hosts:
+        10.128.0.159:
