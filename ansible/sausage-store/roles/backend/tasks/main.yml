@@ -1,18 +1,19 @@
 ---
 # tasks file for backend
 
-- name: Create service user
+- name: Create backend-service user
   user:
     name: "{{ backend_user }}"
     create_home: no
     shell: /sbin/nologin
 
-- name: Creates application directory
+- name: Creates backend application directory
   file:
     path: "{{ backend_workdir }}"
     state: directory
     owner: "{{ backend_user }}"
     group: "{{ backend_user }}"
+
 - name: Creates logs directory
   file:
     path: /logs
@@ -20,7 +21,7 @@
     owner: "{{ backend_user }}"
     group: "{{ backend_user }}"
 
-- name: Download application package
+- name: Download backend-application package from artifact storage
   maven_artifact:
     dest: "{{ backend_workdir }}sausage-store.jar"
     repository_url: https://nexus.praktikum-services.ru/repository/sausage-store-gaydukov-backend2

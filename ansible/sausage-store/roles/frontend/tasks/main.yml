@@ -12,14 +12,14 @@
     state: present
 
 
-- name: Create service user
+- name: Create frontend-service user
   user:
     name: "{{ frontend_user }}"
     groups: "{{ frontend_user }},{{ backend_user }}"
     create_home: no
     shell: /sbin/nologin
 
-- name: Creates application directory
+- name: Create frontend-application directory
   file:
     path: "{{ frontend_workdir }}"
     state: directory
@@ -27,7 +27,7 @@
     group: "{{ frontend_user }}"
     mode: 0755
 
-- name: Creates logs directory
+- name: Ensure logs directory exists
   file:
     path: /logs
     state: directory
@@ -39,32 +39,16 @@
     src: ./dist/node.tgz
     dest: /usr/local
 
-- name: install nodeJS http-server
+- name: Install nodeJS http-server
   command: npm install -g http-server
 
-- name: Download frontend package
+- name: Download frontend package from artifact storage
   nexus:
     nexus: https://nexus.praktikum-services.ru
     repository: sausage-store-gaydukov-frontend
     http_user: "{{ nexus_user }}"
     http_pass: "{{ nexus_pass }}"
   register: nexus_download
-
-#- name: download frontend package from nexus
-#  uri:
-#    url: https://nexus.praktikum-services.ru/service/rest/repository/browse/sausage-store-gaydukov-frontend/
-#    user: "{{ nexus_user }}"
-#    password: "{{ nexus_pass }}"
-#    method: GET
-#    force_basic_auth: yes
-#    status_code: 200
-#    body_format: json
-#    return_content: yes
-#  register: nexus_reply
-
-#- name: debug nexus
-#  debug:
-#    var: nexus_reply.json
 
 - name: Untar frontend package
   unarchive:

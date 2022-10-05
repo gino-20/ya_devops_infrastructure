@@ -3,7 +3,7 @@
 - name: Update apt-get repo and cache
   apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
 
-- name: Upgrade all apt packages
+- name: Upgrade all system packages
   apt: upgrade=dist force_apt_get=yes autoremove=yes
 
 - name: Install Java17
@@ -12,10 +12,10 @@
 - name: Install PIP
   apt: name=python3-pip state=present 
 
-- name: Create links
+- name: Create python symlinks
   command: ln -sf /usr/bin/python3 /usr/bin/python
 
-- name: Unconditionally reboot the machine with all defaults
+- name: Reboot the VM for changes to take effect
   ansible.builtin.reboot:
 
 - name: Install lxml package
