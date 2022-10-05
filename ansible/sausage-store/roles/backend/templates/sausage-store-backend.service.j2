@@ -1,0 +1,14 @@
+[Unit]
+Description=Sausage store service backend
+
+[Service]
+User={{ backend_user }}
+Environment="LOG_PATH=/logs/"
+Environment="REPORT_PATH=/var/www-data/htdocs/"
+StandardOutput=file:/logs/out.log
+WorkingDirectory={{ backend_workdir }}
+ExecStart=java -jar sausage-store.jar --server.port=9081 --server.address=127.0.0.1
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

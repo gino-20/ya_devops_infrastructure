@@ -1,2 +1,103 @@
 ---
 # tasks file for frontend
+
+- name: Ensure group "{{ backend_user }}" exists
+  group:
+    name: "{{ backend_user }}"
+    state: present
+
+- name: Ensure group "{{ frontend_user}}" exists
+  group:
+    name: "{{ frontend_user }}"
+    state: present
+
+
+- name: Create service user
+  user:
+    name: "{{ frontend_user }}"
+    groups: "{{ frontend_user }},{{ backend_user }}"
+    create_home: no
+    shell: /sbin/nologin
+
+- name: Creates application directory
+  file:
+    path: "{{ frontend_workdir }}"
+    state: directory
+    owner: "{{ frontend_user }}"
+    group: "{{ frontend_user }}"
+
+- name: Creates logs directory
+  file:
+    path: /logs
+    state: directory
+    owner: "{{ backend_user }}"
+    group: "{{ backend_user }}"
+
+- name: Deploy nodeJS
+  unarchive:
+    src: ./dist/node.tgz
+    dest: /usr/local
+
+- name: install nodeJS http-server
+  command: npm install -g http-server
+
+- name: Download frontend package
+  nexus:
+    nexus: https://nexus.praktikum-services.ru
+    repository: sausage-store-gaydukov-frontend
+    http_user: "{{ nexus_user }}"
+    http_pass: "{{ nexus_pass }}"
+  register: nexus_download
+
+#- name: download frontend package from nexus
+#  uri:
+#    url: https://nexus.praktikum-services.ru/service/rest/repository/browse/sausage-store-gaydukov-frontend/
+#    user: "{{ nexus_user }}"
+#    password: "{{ nexus_pass }}"
+#    method: GET
+#    force_basic_auth: yes
+#    status_code: 200
+#    body_format: json
+#    return_content: yes
+#  register: nexus_reply
+
+#- name: debug nexus
+#  debug:
+#    var: nexus_reply.json
+
+- name: Untar frontend package
+  unarchive:
+    remote_src: yes
+    src: "{{ nexus_download.filename }}"
+    dest: "{{ frontend_workdir }}"
+    owner: "{{ frontend_user }}"
+        
+- name: Deploy unit-file template
+  template:
+    src: sausage-store-frontend.service.j2
+    dest: /etc/systemd/system/sausage-store-frontend.service
+
+- name: Reload systemd config
+  systemd:
+    daemon_reload: yes
+
+- name: Launch frontend service
+  service:
+    name: sausage-store-frontend
+    state: started
+
+- name: Modify iptable rules
+  ansible.builtin.iptables:
+    table: nat
+    chain: PREROUTING
+    protocol: tcp
+    in_interface: eth0
+    destination_port: 80
+    jump: DNAT
+    to_destination: 127.0.0.1:9000
+    comment: Redirect web traffic to localhost port 9000
+  become: yes
+
+- name: Route 80 port to localhost
+  command: sysctl -w net.ipv4.conf.eth0.route_localnet=1
+

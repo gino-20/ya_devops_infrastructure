@@ -1,4 +1,6 @@
-- name: Один плей для запуска backend сервиса сосисочной
-  hosts: all # Шаблон целевых хостов это группа хостов с именем backend
+- name: Один плей для запуска сервиса сосисочной
+  hosts: all 
   roles: # Список ansible-ролей для backend-серверов
+    - common
     - backend
+    - frontend
