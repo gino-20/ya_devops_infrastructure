@@ -10,7 +10,7 @@ terraform {
 
 
 resource "yandex_compute_instance" "vm-1" {
-    count = 2
+    count = 1
     name = "chapter5-lesson2-alexey-v-gaydukov-${count.index}"
 
     resources {
@@ -26,7 +26,7 @@ resource "yandex_compute_instance" "vm-1" {
 
     network_interface {
         subnet_id = "e9bgji3n08h5drjmfedn"
-        nat       = false
+        nat       = true
     }
 
     metadata = {
