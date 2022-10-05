@@ -45,11 +45,11 @@ options:
 '''
 
 EXAMPLES = '''
-- name: Donwload latest artifact
+- name: Download latest artifact
   nexus:
-    nexus=http://nexus.vpro.nl
+    nexus=http://practicum.nexus.yandex.ru
     repository=alex
-    extension=jar
+    extension=tar.gz
 
 '''
 
@@ -57,13 +57,11 @@ from ansible.module_utils.basic import *
 from ansible.module_utils.parsing.convert_bool import *
 import urllib3
 from bs4 import BeautifulSoup
-from datetime import datetime
-from wsgiref.handlers import format_date_time
-import xml.etree.ElementTree as ET
 
 # Check the repository connection
 
-def check_url(url: str, creds = False) -> bool:
+
+def check_url(url: str, creds=False) -> bool:
     http = urllib3.PoolManager()
     if creds:
         headers = urllib3.make_headers(basic_auth=creds)
@@ -72,14 +70,11 @@ def check_url(url: str, creds = False) -> bool:
     
     request = http.request('GET', url, headers=headers)
     request.release_conn()
-#    result['failed'] = False
-#    result['code'] = request.status_code
-#    result['msg'] = "OK"
-#    result['changed'] = True
     return request.status == 200
 
 
 def download_artifact(url: str, version: str, filename: str, creds: str, extension: str) -> bool:
+    ok = False
     http = urllib3.PoolManager()
     # Check for basic authentication
     if creds:
@@ -104,15 +99,15 @@ def download_artifact(url: str, version: str, filename: str, creds: str, extensi
     soup = BeautifulSoup(request.data, 'lxml')
     hrefs = soup.find_all('a', href=True)
     links = [i['href'] for i in hrefs]
-    print(links)
     # Check that the stored artifact has desired extension
-#    if len(links) != 2 or not links[-1].endswith(extension):
-#        return
     for i in links:
         if i.endswith(extension):
             download_url = i
+            ok = True
             break
-    print(download_url)
+    if not ok:
+        # Means there is no valid extension found
+        return
     # Modify download_url to download artifact
     request = http.request('GET', download_url, headers=headers, preload_content=False)
     # Save artifact to local folder
@@ -123,13 +118,9 @@ def download_artifact(url: str, version: str, filename: str, creds: str, extensi
                 break
             file.write(t_data)
         request.release_conn()
-#    result['failed'] = False
-#    result['filename'] = filename
-#    result['msg'] = "OK"
-#    result['changed'] = True
     return True
 
-import hashlib
+
 import os.path
 
 
