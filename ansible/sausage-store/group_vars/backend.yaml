@@ -1,0 +1,5 @@
+all: # Все серверы в нашем inventory, all - обязателен
+  children: # Дочерние группы для all
+    backend: # Группа хостов с именем backend
+      hosts:
+        178.154.204.35:

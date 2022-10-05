@@ -1,0 +1,31 @@
+---
+# tasks file for backend
+- name: Update apt-get repo and cache
+  apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
+
+- name: Upgrade all apt packages
+  apt: upgrade=dist force_apt_get=yes autoremove=yes
+
+- name: Install Java17
+  apt: name=openjdk-17-jre state=present clean=yes
+
+- name: Install PIP
+  apt: name=python3-pip state=present 
+
+- name: Create links
+  command: ln -sf /usr/bin/python3 /usr/bin/python
+
+- name: Unconditionally reboot the machine with all defaults
+  ansible.builtin.reboot:
+
+- name: Install lxml package
+  pip:
+    name: lxml
+
+- name: Install urllib3 package
+  pip:
+    name: urllib3
+
+- name: Install bs4 package
+  pip:
+    name: bs4

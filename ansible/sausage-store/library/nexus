@@ -1,0 +1,200 @@
+#!/usr/bin/env python
+
+ANSIBLE_METADATA = {'status': ['preview'],
+                    'supported_by': 'community',
+                    'metadata_version': '0.1'}
+
+
+DOCUMENTATION = '''
+---
+module: nexus
+short_description: Download and install a raw artifact from storage.
+options:
+    nexus:
+        required: true
+        description:
+            - Base url of the nexus
+    version:
+        required: false
+        description:
+            - Artifact version to download
+            - Defaults to latest
+    destdir:
+        required: false
+        description:
+            - The destination dir of the downloaded artifacts
+            - Defaults to '/tmp/downloaded_artifacts'
+    repository:
+        required:: true
+        description:
+            - Name of the repository in nexus notation
+    extension:
+        required: false
+        description:
+            - The artifact extension (Defaults to 'tar.gz')
+    http_user:
+        required: false
+        description:
+            - If the storage need a basic authentication, the user name
+              can be provided here
+    http_pass:
+        required: false
+        description:
+            - If the storage need a basic authentication, the password
+              can be provided here
+'''
+
+EXAMPLES = '''
+- name: Donwload latest artifact
+  nexus:
+    nexus=http://nexus.vpro.nl
+    repository=alex
+    extension=jar
+
+'''
+
+from ansible.module_utils.basic import *
+from ansible.module_utils.parsing.convert_bool import *
+import urllib3
+from bs4 import BeautifulSoup
+from datetime import datetime
+from wsgiref.handlers import format_date_time
+import xml.etree.ElementTree as ET
+
+# Check the repository connection
+
+def check_url(url: str, creds = False) -> bool:
+    http = urllib3.PoolManager()
+    if creds:
+        headers = urllib3.make_headers(basic_auth=creds)
+    else:
+        headers = urllib3.make_headers()
+    
+    request = http.request('GET', url, headers=headers)
+    request.release_conn()
+#    result['failed'] = False
+#    result['code'] = request.status_code
+#    result['msg'] = "OK"
+#    result['changed'] = True
+    return request.status == 200
+
+
+def download_artifact(url: str, version: str, filename: str, creds: str, extension: str) -> bool:
+    http = urllib3.PoolManager()
+    # Check for basic authentication
+    if creds:
+        headers = urllib3.make_headers(basic_auth=creds)
+    else:
+        headers = urllib3.make_headers()
+    # Get browsable page contents with versions
+    request = http.request('GET', url, headers=headers)
+    soup = BeautifulSoup(request.data, 'lxml')
+    hrefs = soup.find_all('a', href=True)
+    links = [i['href'] for i in hrefs]
+    # Search for desired version
+    if version != 'latest':
+        try:
+            download_url = url + links[links.index(version)] + "/"
+        except AttributeError:
+            return
+    else:
+        download_url = url + links[-1] + "/"
+    # Get contents of the version subfolder
+    request = http.request('GET', download_url, headers=headers)
+    soup = BeautifulSoup(request.data, 'lxml')
+    hrefs = soup.find_all('a', href=True)
+    links = [i['href'] for i in hrefs]
+    print(links)
+    # Check that the stored artifact has desired extension
+#    if len(links) != 2 or not links[-1].endswith(extension):
+#        return
+    for i in links:
+        if i.endswith(extension):
+            download_url = i
+            break
+    print(download_url)
+    # Modify download_url to download artifact
+    request = http.request('GET', download_url, headers=headers, preload_content=False)
+    # Save artifact to local folder
+    with open(filename, 'wb') as file:
+        while True:
+            t_data = request.read(1024)
+            if not t_data:
+                break
+            file.write(t_data)
+        request.release_conn()
+#    result['failed'] = False
+#    result['filename'] = filename
+#    result['msg'] = "OK"
+#    result['changed'] = True
+    return True
+
+import hashlib
+import os.path
+
+
+def main():
+
+    module = AnsibleModule(
+        argument_spec=dict(
+            nexus=dict(required=True),
+            version=dict(required=False, default='latest'),
+            repository=dict(required=True),
+            destdir=dict(required=False, default="/tmp/downloaded_artifacts"),
+            filename=dict(required=False, default=None),
+            extension=dict(required=False, default="tar.gz"),
+            http_user=dict(required=False),
+            http_pass=dict(required=False, no_log=True)
+        ),
+        supports_check_mode=False
+    )
+
+    nexus = module.params['nexus']
+    version = module.params['version']
+    repository = module.params['repository']
+    destdir = module.params['destdir']
+    filename = module.params['filename']
+    extension = module.params['extension']
+    http_user = module.params['http_user']
+    http_pass = module.params['http_pass']
+
+    # Prepare strings and urls before the storage call
+    
+    base_link = nexus if nexus.endswith('/') else (nexus + '/')
+    url = base_link + 'service/rest/repository/browse/' + repository + '/'
+    credentials = http_user + ':' + http_pass
+    
+    # Check url connection
+
+    result = check_url(url, credentials)
+
+    if not result:
+        module.fail_json(url=url)
+
+    # Create generic filename if filename is not set
+    if filename is None:
+        filename = destdir + '/' + 'artifact.tar.gz'
+    else:
+        filename = destdir + '/' + filename
+
+    if not os.path.exists(destdir):
+        os.mkdir(destdir)
+
+    # Try to download an artifact from nexus or artifactory
+    result = download_artifact(url, version, filename, credentials, extension)
+    if not result:
+        module.fail_json(
+            url=url,
+            repository=repository,
+            filename=filename,
+            result=result,
+            msg='failed'
+        )
+
+    module.exit_json(
+        filename=filename,
+        changed='changed'
+    )
+
+
+main()

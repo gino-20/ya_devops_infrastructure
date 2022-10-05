@@ -25,6 +25,7 @@
     state: directory
     owner: "{{ frontend_user }}"
     group: "{{ frontend_user }}"
+    mode: 0755
 
 - name: Creates logs directory
   file:
