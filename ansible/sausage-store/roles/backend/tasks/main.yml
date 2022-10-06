@@ -6,6 +6,7 @@
     name: "{{ backend_user }}"
     create_home: no
     shell: /sbin/nologin
+  become: yes
 
 - name: Creates backend application directory
   file:
@@ -13,6 +14,7 @@
     state: directory
     owner: "{{ backend_user }}"
     group: "{{ backend_user }}"
+  become: yes
 
 - name: Creates logs directory
   file:
@@ -20,6 +22,7 @@
     state: directory
     owner: "{{ backend_user }}"
     group: "{{ backend_user }}"
+  become: yes
 
 - name: Download backend-application package from artifact storage
   maven_artifact:
@@ -31,18 +34,22 @@
     username: "{{ nexus_user }}"
     password: "{{ nexus_pass }}"
     owner: "{{ backend_user }}"
+  become: yes
 
 - name: Deploy unit-file template
   template:
     src: sausage-store-backend.service.j2
     dest: /etc/systemd/system/sausage-store-backend.service
+  become: yes
 
 
 - name: Reload systemd config
   systemd:
     daemon_reload: yes
+  become: yes
 
 - name: Launch backend service
   service:
     name: sausage-store-backend
     state: started
+  become: yes
