@@ -52,4 +52,5 @@
   service:
     name: sausage-store-backend
     state: started
+    enabled: yes
   become: yes

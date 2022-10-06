@@ -80,6 +80,7 @@
   service:
     name: sausage-store-frontend
     state: started
+    enabled: yes
   become: yes
 
 - name: Modify iptable rules
