@@ -49,18 +49,19 @@
   command: npm install -g http-server
   become: yes
 
-- name: Download frontend package from artifact storage
-  nexus:
-    nexus: https://nexus.praktikum-services.ru
-    repository: sausage-store-gaydukov-frontend
-    http_user: "{{ nexus_user }}"
-    http_pass: "{{ nexus_pass }}"
+- name: Download frontend package from artifact storage, version "{{ frontend_version }}"
+  get_url:
+    url: "https://nexus.praktikum-services.ru/repository/sausage-store-gaydukov-frontend/{{ frontend_version }}/sausage-store-{{ frontend_version }}.tar.gz"
+    url_username: "{{ nexus_user }}"
+    url_password: "{{ nexus_pass }}"
+    force_basic_auth: yes
+    dest: /tmp/front.tar.gz
   register: nexus_download
 
 - name: Untar frontend package
   unarchive:
     remote_src: yes
-    src: "{{ nexus_download.filename }}"
+    src: "{{ nexus_download.dest }}"
     dest: "{{ frontend_workdir }}"
     owner: "{{ frontend_user }}"
   become: yes
