@@ -1,0 +1,5 @@
+[sausage_server]
+server1 ansible_host=84.252.129.21
+[sausage_server:vars]
+ansible_user=ansible
+ansible_ssh_private_key_file=/home/alex/stuff/Ucheba/ya_prakticum/DevOPS/ch5_task2/terraform_1.3.0_linux_amd64/example-01/ssh_key_terraform

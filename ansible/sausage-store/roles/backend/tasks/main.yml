@@ -1,0 +1,56 @@
+---
+# tasks file for backend
+
+- name: Create backend-service user
+  user:
+    name: "{{ backend_user }}"
+    create_home: no
+    shell: /sbin/nologin
+  become: yes
+
+- name: Creates backend application directory
+  file:
+    path: "{{ backend_workdir }}"
+    state: directory
+    owner: "{{ backend_user }}"
+    group: "{{ backend_user }}"
+  become: yes
+
+- name: Creates logs directory
+  file:
+    path: /logs
+    state: directory
+    owner: "{{ backend_user }}"
+    group: "{{ backend_user }}"
+  become: yes
+
+- name: Download backend-application package from artifact storage
+  maven_artifact:
+    dest: "{{ backend_workdir }}sausage-store.jar"
+    repository_url: https://nexus.praktikum-services.ru/repository/sausage-store-gaydukov-backend2
+    group_id: "com.yandex.practicum.devops"
+    artifact_id: sausage-store
+    version: latest
+    username: "{{ nexus_user }}"
+    password: "{{ nexus_pass }}"
+    owner: "{{ backend_user }}"
+  become: yes
+
+- name: Deploy unit-file template
+  template:
+    src: sausage-store-backend.service.j2
+    dest: /etc/systemd/system/sausage-store-backend.service
+  become: yes
+
+
+- name: Reload systemd config
+  systemd:
+    daemon_reload: yes
+  become: yes
+
+- name: Launch backend service
+  service:
+    name: sausage-store-backend
+    state: started
+    enabled: yes
+  become: yes

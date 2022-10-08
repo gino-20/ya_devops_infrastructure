@@ -1,0 +1,8 @@
+---
+# vars file for frontend
+frontend_workdir: /var/www-data/
+frontend_user: www-data
+backend_user: jarservice
+nexus_user: a.gaydukov
+nexus_pass: '%DjpB+u5'
+frontend_version: 1.0.190809

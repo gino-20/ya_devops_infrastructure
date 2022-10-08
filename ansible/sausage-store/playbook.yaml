@@ -1,0 +1,6 @@
+- name: Один плей для запуска сервиса сосисочной
+  hosts: all 
+  roles: # Список ansible-ролей для backend-серверов
+    - common
+    - backend
+    - frontend

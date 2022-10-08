@@ -1,0 +1,12 @@
+[Unit]
+Description=Sausage store service frontend
+
+[Service]
+User={{ frontend_user }}
+StandardOutput=file:/logs/out-front.log
+WorkingDirectory={{ frontend_workdir }}
+ExecStart=http-server ./frontend/ -p 9000 -a 127.0.0.1 --proxy htpp://127.0.0.1:9081
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

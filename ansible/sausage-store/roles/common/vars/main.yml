@@ -1,0 +1,6 @@
+---
+# vars file for backend
+backend_user: jarservice
+backend_workdir: /opt/jarservice/
+nexus_user: a.gaydukov
+nexus_pass: '%DjpB+u5'
