@@ -26,6 +26,9 @@ spec:
               secretKeyRef:
                 name: vault
                 key: vault_token
+        envFrom:
+          - configMapRef:
+              name: backend-config
         ports:
           - name: backend
             containerPort: 8080

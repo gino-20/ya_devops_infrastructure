@@ -23,3 +23,9 @@ spec:
         ports:
           - name: backend-report
             containerPort: 8080
+        envFrom:
+          - configMapRef:
+              name: backend-report-config
+      imagePullSecrets:
+        - name: docker-config-secret
+
