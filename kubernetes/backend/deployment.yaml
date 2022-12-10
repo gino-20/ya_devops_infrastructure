@@ -19,7 +19,7 @@ spec:
       containers:
       - image: gitlab.praktikum-services.ru:5050/a.gaydukov/sausage-store/sausage-backend:kuber
         name: backend
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         env:
           - name: VAULT_TOKEN
             valueFrom:
