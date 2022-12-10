@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  labels: 
+    app: backend
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - image: gitlab.praktikum-services.ru:5050/a.gaydukov/sausage-store/sausage-backend:kuber
+        name: backend
+        imagePullPolicy: IfNotPresent
+        env:
+          - name: VAULT_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: vault
+                key: vault_token
+        ports:
+          - name: backend
+            containerPort: 8080
+        livenessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+          initialDelaySeconds: 15
+          periodSeconds: 30
+          timeoutSeconds: 2
+          failureThreshold: 6
+      imagePullSecrets:
+        - name: docker-config-secret

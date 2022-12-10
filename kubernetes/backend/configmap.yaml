@@ -1,0 +1,10 @@
+apiVersion: v1
+data:
+  SPRING_DATASOURCE_USERNAME: "alexeyvgaydukov"
+  SPRING_DATASOURCE_PASSWORD: "GKNMLs21uhDg"
+  VAULT_HOST: "http://51.250.91.138:8200"
+  SPRING_FLYWAY_BASELINE-ON-MIGRATE: "true"
+  PORT: "8080"
+kind: ConfigMap
+metadata:
+  name: backend-config
