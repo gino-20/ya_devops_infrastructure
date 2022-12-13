@@ -1,0 +1,7 @@
+apiVersion: v1
+data:
+  DB: "mongodb://alexeyvgaydukov:GKNMLs21uhDg@rc1b-9uta14l49rzzv596.mdb.yandexcloud.net:27018/alexeyvgaydukov?tls=true&tlsAllowInvalidCertificates=true"
+  PORT: "8080"
+kind: ConfigMap
+metadata:
+  name: backend-report-config
