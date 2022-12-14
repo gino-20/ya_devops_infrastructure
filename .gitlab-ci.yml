@@ -7,5 +7,6 @@ backend-report:
   script:
     - mkdir -p ~/.kube
     - echo -n "${CONFIG}"|base64 -d>~/.kube/config
-    - cat ~/.kube/config
     - kubectl config get-contexts
+    - cd kubernetes
+    - kubectl apply -f backend-report
