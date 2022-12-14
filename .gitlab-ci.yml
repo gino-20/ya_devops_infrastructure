@@ -6,5 +6,5 @@ backend-report:
   image: bitnami/kubectl:latest
   script:
     - mkdir -p ~/.kube
-    - echo -n ${KUBECONFIG}|base64 -d>~/.kube/config
+    - echo -n "${KUBECONFIG}"|base64 -d>~/.kube/config
     - ls
