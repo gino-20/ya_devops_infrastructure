@@ -1,0 +1,10 @@
+stages:
+  - deploy
+
+backend-report:
+  stage: deploy
+  image: bitnami/kubectl:latest
+  script:
+    - mkdir -p ~/.kube
+    - echo -n ${KUBECONFIG}|base64 -d>~/.kube/config
+    - ls
