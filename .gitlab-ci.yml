@@ -1,4 +1,7 @@
 .prepare_env:
+  environment:
+    name: k8s-sausage
+    url: https://gaydukov-08.k8s.praktikum-services.tech/
   before_script:
     - mkdir -p ~/.kube
     - echo -n "${CONFIG}"|base64 -d>~/.kube/config
