@@ -17,14 +17,14 @@ backend-report:
 
 backend:
   stage: deploy
-  image: bitnami/kubectl:lates
+  image: bitnami/kubectl:latest
   extends: .prepare_env
   script:
     - kubectl apply -f backend-report
 
 frontend:
   stage: deploy
-  image: bitnami/kubectl:lates
+  image: bitnami/kubectl:latest
   extends: .prepare_env
   script:
     - kubectl apply -f frontend
