@@ -34,7 +34,6 @@ frontend:
   extends: .prepare_env
   script:
     - kubectl apply -f frontend
-    - kubectl apply -f ingress.yaml
   only:
     changes:
       - kubernetes/**/*
