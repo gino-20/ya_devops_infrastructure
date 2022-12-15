@@ -11,32 +11,15 @@
 stages:
   - deploy
 
-backend-report:
+sausage-store-k8s-deploy:
   stage: deploy
   image: bitnami/kubectl:latest
   extends: .prepare_env
   script:
     - kubectl apply -f backend-report
-  only:
-    changes:
-      - kubernetes/**/*
-
-backend:
-  stage: deploy
-  image: bitnami/kubectl:latest
-  extends: .prepare_env
-  script:
     - kubectl apply -f backend
-  only:
-    changes:
-      - kubernetes/**/*
-
-frontend:
-  stage: deploy
-  image: bitnami/kubectl:latest
-  extends: .prepare_env
-  script:
     - kubectl apply -f frontend
   only:
     changes:
       - kubernetes/**/*
+
