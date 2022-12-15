@@ -14,6 +14,9 @@ backend-report:
   extends: .prepare_env
   script:
     - kubectl apply -f backend-report
+  only:
+    changes:
+      - backend-report/**/*
 
 backend:
   stage: deploy
@@ -21,6 +24,9 @@ backend:
   extends: .prepare_env
   script:
     - kubectl apply -f backend
+  only:
+    changes:
+      - backend/**/*
 
 frontend:
   stage: deploy
@@ -29,3 +35,6 @@ frontend:
   script:
     - kubectl apply -f frontend
     - kubectl apply -f ingress.yaml
+  only:
+    changes:
+      - frontend/**/*
