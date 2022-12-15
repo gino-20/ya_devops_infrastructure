@@ -20,7 +20,7 @@ backend:
   image: bitnami/kubectl:latest
   extends: .prepare_env
   script:
-    - kubectl apply -f backend-report
+    - kubectl apply -f backend
 
 frontend:
   stage: deploy
