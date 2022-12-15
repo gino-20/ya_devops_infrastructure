@@ -1,12 +1,31 @@
+.prepare_env:
+  before_script:
+    - mkdir -p ~/.kube
+    - echo -n "${CONFIG}"|base64 -d>~/.kube/config
+    - kubectl config get-contexts
+    - cd kubernetes
+
 stages:
   - deploy
 
 backend-report:
   stage: deploy
   image: bitnami/kubectl:latest
+  extends: .prepare_env
   script:
-    - mkdir -p ~/.kube
-    - echo -n "${CONFIG}"|base64 -d>~/.kube/config
-    - kubectl config get-contexts
-    - cd kubernetes
     - kubectl apply -f backend-report
+
+backend:
+  stage: deploy
+  image: bitnami/kubectl:lates
+  extends: .prepare_env
+  script:
+    - kubectl apply -f backend-report
+
+frontend:
+  stage: deploy
+  image: bitnami/kubectl:lates
+  extends: .prepare_env
+  script:
+    - kubectl apply -f frontend
+    - kubectl apply -f ingress.yaml
