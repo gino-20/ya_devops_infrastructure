@@ -47,5 +47,8 @@ spec:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
             - matchExpressions:
-              - app: frontend
+              - key: app
+                operator: In
+                values:
+                - frontend
 
