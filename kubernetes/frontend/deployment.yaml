@@ -46,6 +46,6 @@ spec:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
-              - matchExpressions:
-                - key: disktype
+            - matchExpressions:
+              - app: frontend
 
