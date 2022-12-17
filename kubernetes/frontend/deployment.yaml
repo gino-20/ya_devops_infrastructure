@@ -5,6 +5,12 @@ metadata:
   labels: 
     app: frontend
 spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - app: frontend
   revisionHistoryLimit: 15
   replicas: 1
   strategy:
