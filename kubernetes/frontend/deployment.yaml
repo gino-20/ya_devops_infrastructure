@@ -5,12 +5,6 @@ metadata:
   labels: 
     app: frontend
 spec:
-  affinity:
-    nodeAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-        nodeSelectorTerms:
-        - matchExpressions:
-          - app: frontend
   revisionHistoryLimit: 15
   replicas: 1
   strategy:
@@ -48,4 +42,10 @@ spec:
             name: frontend-config
       imagePullSecrets:
         - name: docker-config-secret
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                - key: disktype
 
