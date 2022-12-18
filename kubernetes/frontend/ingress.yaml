@@ -6,6 +6,9 @@ metadata:
 spec:
   # В кластере может быть несколько Ingress Controllers, мы используем NGINX
   ingressClassName: "nginx"
+  tls:
+    - hosts: 
+        - "gaydukov-08.k8s.praktikum-services.tech"
   rules:
     # Хост определяет правило направления траффика по доменному имени
   - host: "gaydukov-08.k8s.praktikum-services.tech"

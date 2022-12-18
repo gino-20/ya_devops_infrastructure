@@ -1,0 +1,25 @@
+.prepare_env:
+  environment:
+    name: k8s-sausage
+    url: https://gaydukov-08.k8s.praktikum-services.tech/
+  before_script:
+    - mkdir -p ~/.kube
+    - echo -n "${CONFIG}"|base64 -d>~/.kube/config
+    - kubectl config get-contexts
+    - cd kubernetes
+
+stages:
+  - deploy
+
+sausage-store-k8s-deploy:
+  stage: deploy
+  image: bitnami/kubectl:latest
+  extends: .prepare_env
+  script:
+    - kubectl apply -f backend-report
+    - kubectl apply -f backend
+    - kubectl apply -f frontend
+  only:
+    changes:
+      - kubernetes/**/*
+
