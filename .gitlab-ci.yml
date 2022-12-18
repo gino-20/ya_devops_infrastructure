@@ -6,6 +6,10 @@
     - mkdir -p ~/.kube
     - echo -n "${CONFIG}"|base64 -d>~/.kube/config
     - kubectl config get-contexts
+    - >
+      git clone https://github.com/kubernetes/autoscaler.git && 
+      cd autoscaler/vertical-pod-autoscaler/hack && 
+      ./vpa-up.sh 
     - cd kubernetes
 
 stages:
