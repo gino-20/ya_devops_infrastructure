@@ -18,7 +18,7 @@ spec:
         app: backend-report
     spec:
       containers:
-      - image: gitlab.praktikum-services.ru:5050/a.gaydukov/sausage-store/sausage-backend-report:kuber
+      - image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         name: backend-report
         imagePullPolicy: IfNotPresent
         ports:

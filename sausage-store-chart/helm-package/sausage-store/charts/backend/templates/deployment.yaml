@@ -21,7 +21,7 @@ spec:
         app: backend
     spec:
       containers:
-      - image: "{{ .Values.image.backend }}:{{ .Values.image.tag }}"
+      - image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         name: backend
         imagePullPolicy: Always
         env:
