@@ -1,12 +1,11 @@
-#.prepare_env:
-#  environment:
-#    name: k8s-sausage
-#    url: https://gaydukov-08.k8s.praktikum-services.tech/
-#  before_script:
-#    - mkdir -p ~/.kube
-#    - echo -n "${CONFIG}"|base64 -d>~/.kube/config
-#    - kubectl config get-contexts
-#    - cd kubernetes
+.prepare_env:
+  environment:
+    name: k8s-sausage
+    url: https://gaydukov-08.k8s.praktikum-services.tech/
+  before_script:
+    - mkdir -p ~/.kube
+    - echo -n "${CONFIG}"|base64 -d>~/.kube/config
+    - kubectl config get-contexts
 
 stages:
   - build
@@ -34,8 +33,9 @@ sausage-store-helm-upload:
 sausage-store-helm-deploy:
   stage: deploy
   image: alpine/helm
+  extends: .prepare_env
   script:
-    - helm repo add nexus ${NEXUS_URI} --username ${NEXUS_USER} --password '${NEXUS_PASS}'
+    - helm repo add nexus ${NEXUS_URI} --username ${NEXUS_USER} --password ${NEXUS_PASS}
     - helm repo update nexus
     - helm upgrade --install sausage-store --atomic --timeout 15m nexus/sausage-store
 
