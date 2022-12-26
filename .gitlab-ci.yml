@@ -34,7 +34,7 @@ sausage-store-helm-deploy:
   image: alpine/helm
   extends: .prepare_env
   script:
-    - PASS=$(echo -n ${NEXUS_PASS_PROTECTED | base64 -d)
+    - PASS=$(echo -n ${NEXUS_PASS_PROTECTED} | base64 -d)
     - helm repo add nexus ${NEXUS_URI} --username ${NEXUS_USER} --password $PASS
     - helm repo update nexus
     - helm upgrade --install sausage-store --atomic --timeout 15m nexus/sausage-store
