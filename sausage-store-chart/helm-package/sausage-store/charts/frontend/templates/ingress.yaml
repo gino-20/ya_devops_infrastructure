@@ -3,15 +3,19 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: frontend
+  labels:
+    app.kubernetes.io/managed-by: Helm
+    meta.helm.sh/release-name: sausage-store
+    meta.helm.sh/release-namespace: 08-a-gaydukov
 spec:
   # В кластере может быть несколько Ingress Controllers, мы используем NGINX
   ingressClassName: "nginx"
   tls:
     - hosts: 
-        - "gaydukov-08.k8s.praktikum-services.tech"
+        - {{ .Values.fqdn }}
   rules:
     # Хост определяет правило направления траффика по доменному имени
-  - host: "gaydukov-08.k8s.praktikum-services.tech"
+  - host: {{ .Values.fqdn }}
     http:
       # Для различных путей в URL можно указать различные бэкенд-сервисы
       paths:
@@ -24,4 +28,4 @@ spec:
             name: frontend
             port:
               # У сервиса может быть несколько портов, указываем нужный нам
-              number: 8080
+              number: {{ .Values.container_port }}

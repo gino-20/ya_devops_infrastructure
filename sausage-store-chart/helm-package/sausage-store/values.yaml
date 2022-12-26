@@ -2,18 +2,97 @@ backend:
   image: 
     repository: gitlab.praktikum-services.ru:5050/a.gaydukov/sausage-store/sausage-backend
     tag: kuber
+  replicas: 1
+  spring_datasource_url: "jdbc:postgresql://rc1b-micxirmrnkrwhvb8.mdb.yandexcloud.net:6432/alexeyvgaydukov"
+  spring_datasource_username: "alexeyvgaydukov"
+  spring_datasource_password: "GK++NMLs21uhDg"
+  vault_host: "51.250.91.138"
+  vault_token: aHZzLjI4Tm9nb3hMZWhZUnRBZDBMMjF3cjhQQQ==
+  port: "8080"
+  containerPolicies:
+    - containerName: "*"
+      minAllowed:
+        cpu: 0m
+        memory: 0Mi
+      maxAllowed:
+        cpu: 1
+        memory: 500Mi
+      controlledResources: ["cpu", "memory"]
+      controlledValues: RequestsAndLimits
+  labels:
+    app: backend
+    app.kubernetes.io/name: sausage-store
+    app.kubernetes.io/instance: backend
+    app.kubernetes.io/version: 0.1.0
+    app.kubernetes.io/managed-by: Helm
+    meta.helm.sh/chart: backend-0.1.0
+    meta.helm.sh/release-name: release-name
+    meta.helm.sh/release-namespace: 08-a-gaydukov
+    app.kubernetes.io/component: backend
+    app.kubernetes.io/part-of: sausage-store
+    env: production
 
 frontend:
   image: 
     repository: gitlab.praktikum-services.ru:5050/a.gaydukov/sausage-store/sausage-frontend
     tag: kuber
-  fqdn: https://gaydukov-08.k8s.praktikum-services.tech/
+  fqdn: gaydukov-08.k8s.praktikum-services.tech
+  replicas: 1
+  container_port: "8080"
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: app
+            operator: In
+            values:
+            - frontend
+  labels:
+    app: frontend
+    app.kubernetes.io/name: sausage-store
+    app.kubernetes.io/instance: frontend
+    app.kubernetes.io/version: 0.1.0
+    app.kubernetes.io/managed-by: Helm
+    meta.helm.sh/chart: frontend
+    meta.helm.sh/release-name: release-name
+    meta.helm.sh/release-namespace: 08-a-gaydukov
+    app.kubernetes.io/component: frontend
+    app.kubernetes.io/part-of: sausage-store
+    env: production
 
 backend-report:
   image: 
     repository: gitlab.praktikum-services.ru:5050/a.gaydukov/sausage-store/sausage-backend-report
     tag: kuber
-# Default values for sausage-store.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
+  replicas: 1
+  container_port: "8080"
+  db_uri: "mongodb://alexeyvgaydukov:GKNMLs21uhDg@rc1b-9uta14l49rzzv596.mdb.yandexcloud.net:27018/alexeyvgaydukov?tls=true&tlsAllowInvalidCertificates=true"
+  db_port: "8080"
+  hpa_spec:
+    minReplicas: 1
+    maxReplicas: 5
+    scaleTargetRef:
+      apiVersion: apps/v1
+      kind: Deployment
+      name: backend-report
+    metrics:
+      - type: Resource
+        resource:
+          name: cpu
+          target:
+            type: Utilization
+            averageUtilization: 75
+  labels:
+    app: backend-report
+    app.kubernetes.io/name: sausage-store
+    app.kubernetes.io/instance: backend-report
+    app.kubernetes.io/version: 0.1.0
+    app.kubernetes.io/managed-by: Helm
+    meta.helm.sh/chart: backend-report-0.1.0
+    meta.helm.sh/release-name: release-name
+    meta.helm.sh/release-namespace: 08-a-gaydukov
+    app.kubernetes.io/component: backend-report
+    app.kubernetes.io/part-of: sausage-store
+    env: production
 

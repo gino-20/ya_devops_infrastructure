@@ -3,10 +3,10 @@ kind: Deployment
 metadata:
   name: backend-report
   labels: 
-    app: backend-report
+{{ toYaml .Values.labels | indent 4 }}
 spec:
   revisionHistoryLimit: 15
-  replicas: 1
+  replicas: {{ .Values.replicas }}
   strategy:
     type: Recreate
   selector:
@@ -23,7 +23,7 @@ spec:
         imagePullPolicy: IfNotPresent
         ports:
           - name: backend-report
-            containerPort: 8080
+            containerPort: {{ .Values.container_port }}
         envFrom:
           - configMapRef:
               name: backend-report-config

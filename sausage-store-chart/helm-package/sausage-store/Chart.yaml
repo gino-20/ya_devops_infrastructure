@@ -3,6 +3,10 @@ apiVersion: v2
 type: application
 name: sausage-store
 description: Sausage Store Helm Chart
+labels:
+  app.kubernetes.io/managed-by: Helm
+  meta.helm.sh/release-name: sausage-store
+  meta.helm.sh/release-namespace: 08-a-gaydukov
 
 version: 0.1.0
 appVersion: "latest"

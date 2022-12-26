@@ -1,11 +1,11 @@
 apiVersion: v1
 data:
-  SPRING_DATASOURCE_URL: "jdbc:postgresql://rc1b-micxirmrnkrwhvb8.mdb.yandexcloud.net:6432/alexeyvgaydukov"
-  SPRING_DATASOURCE_USERNAME: "alexeyvgaydukov"
-  SPRING_DATASOURCE_PASSWORD: "GK++NMLs21uhDg"
-  VAULT_HOST: "51.250.91.138"
+  SPRING_DATASOURCE_URL: {{ .Values.spring_datasource_url }}
+  SPRING_DATASOURCE_USERNAME: {{ .Values.spring_datasource_username }}
+  SPRING_DATASOURCE_PASSWORD: {{ .Values.spring_datasource_password }}
+  VAULT_HOST: {{ .Values.vault_host }}
   SPRING_FLYWAY_BASELINE-ON-MIGRATE: "true"
-  PORT: "8080"
+  PORT: "{{ .Values.port }}"
 kind: ConfigMap
 metadata:
   name: backend-config

@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: backend
   labels: 
-    app: backend
+{{ toYaml .Values.labels | indent 4 }}
 spec:
   revisionHistoryLimit: 15
   replicas: 1
@@ -35,11 +35,11 @@ spec:
               name: backend-config
         ports:
           - name: backend
-            containerPort: 8080
+            containerPort: {{ .Values.port }}
         livenessProbe:
           httpGet:
             path: /actuator/health
-            port: 8080
+            port: {{ .Values.port }}
           initialDelaySeconds: 15
           periodSeconds: 30
           timeoutSeconds: 2
@@ -60,12 +60,4 @@ spec:
     updateMode: "Auto"
   resourcePolicy:
     containerPolicies:
-      - containerName: "*"
-        minAllowed:
-          cpu: 0m
-          memory: 0Mi
-        maxAllowed:
-          cpu: 1
-          memory: 500Mi
-        controlledResources: ["cpu", "memory"]
-        controlledValues: RequestsAndLimits
+{{ toYaml .Values.containerPolicies | indent 6 }}

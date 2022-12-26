@@ -3,7 +3,7 @@ data:
   default: |
     server {
 
-      listen 8080;
+      listen {{ .Values.container_port }};
 
       location / {
         root   /var/www/html;
