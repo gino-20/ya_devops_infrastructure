@@ -5,7 +5,6 @@
   before_script:
     - mkdir -p ~/.kube
     - echo -n "${CONFIG}"|base64 -d>~/.kube/config
-    - kubectl config get-contexts
 
 stages:
   - build
