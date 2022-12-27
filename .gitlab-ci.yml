@@ -35,7 +35,7 @@ sausage-store-helm-deploy:
   extends: .prepare_env
   script:
     - helm version
-    - helm repo add nexus "${NEXUS_URI}" --username "${NEXUS_USER}" --password $(echo -n ${NEXUS_PASS_PROTECTED} | base64 -d)
+    - helm repo add nexus "${NEXUS_URI}" --username "${NEXUS_USER}" --password "${NEXUS_PASS}"
     - helm repo update nexus
     - helm upgrade --install sausage-store --atomic --timeout 15m nexus/sausage-store
 
