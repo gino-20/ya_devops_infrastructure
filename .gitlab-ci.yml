@@ -31,7 +31,7 @@ stages:
 
 sausage-store-helm-deploy:
   stage: deploy
-  image: ubuntu
+  image: debian:11
   extends: .prepare_env
   script:
     - curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg > /dev/null
