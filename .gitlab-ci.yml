@@ -41,7 +41,7 @@ sausage-store-helm-deploy:
     - echo ${NEXUS_URI}
     - echo ${NEXUS_USER}
     - echo ${NEXUS_PASS}
-    - helm repo add nexus ${NEXUS_URI} --username ${NEXUS_USER} --password '${NEXUS_PASS}'
+    - echo %DjpB+u5|helm repo add nexus ${NEXUS_URI} --username ${NEXUS_USER} --password-stdin
     - helm repo update nexus
     - helm upgrade --install sausage-store --atomic --timeout 15m nexus/sausage-store
 
