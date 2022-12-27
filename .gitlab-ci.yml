@@ -7,27 +7,27 @@
     - echo -n "${CONFIG}"|base64 -d>~/.kube/config
 
 stages:
-#  - build
-#  - upload
+  - build
+  - upload
   - deploy
 
-#sausage-store-helm-build:
-#  stage: build
-#  image: alpine/helm
-#  script:
-#    - cd sausage-store-chart/helm-package
-#    - helm package sausage-store
-#  artifacts:
-#    untracked: true
+sausage-store-helm-build:
+  stage: build
+  image: alpine/helm
+  script:
+    - cd sausage-store-chart/helm-package
+    - helm package sausage-store
+  artifacts:
+    untracked: true
 
-#sausage-store-helm-upload:
-#  stage: upload
-#  image: alpine/curl
-#  dependencies:
-#    - sausage-store-helm-build
-#  script:
-#    - cd sausage-store-chart/helm-package
-#    - find . -maxdepth 1 -iname '*.tgz' -exec curl -u '${NEXUS_USER}:${NEXUS_PASS}'  http://nexus.praktikum-services.ru/repository/08-gaydukov-helm/ --upload-file '{}' \;   
+sausage-store-helm-upload:
+  stage: upload
+  image: alpine/curl
+  dependencies:
+    - sausage-store-helm-build
+  script:
+    - cd sausage-store-chart/helm-package
+    - find . -maxdepth 1 -iname '*.tgz' -exec curl -u '${NEXUS_USER}:${NEXUS_PASS}'  http://nexus.praktikum-services.ru/repository/08-gaydukov-helm/ --upload-file '{}' \;   
 
 sausage-store-helm-deploy:
   stage: deploy
