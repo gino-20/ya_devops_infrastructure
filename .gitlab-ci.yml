@@ -31,7 +31,7 @@ stages:
 
 sausage-store-helm-deploy:
   stage: deploy
-  image: alpine/helm:3.14
+  image: alpine/helm:3.7.0
   extends: .prepare_env
   script:
     - helm version
