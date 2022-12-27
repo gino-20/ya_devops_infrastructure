@@ -31,16 +31,9 @@ stages:
 
 sausage-store-helm-deploy:
   stage: deploy
-  image: ubuntu:latest
+  image: alpine/helm
   extends: .prepare_env
   script:
-    - apt update -y
-    - apt install -y curl
-    - curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
-    - helm version
-    - echo ${NEXUS_URI}
-    - echo ${NEXUS_USER}
-    - echo ${NEXUS_PASS}
     - helm repo add nexus ${NEXUS_URI} --username ${NEXUS_USER} --password ${NEXUS_PASS}
     - helm repo update nexus
     - helm upgrade --install sausage-store --atomic --timeout 15m nexus/sausage-store
