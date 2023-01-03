@@ -14,6 +14,8 @@ stages:
 sausage-store-helm-build:
   stage: build
   image: alpine/helm
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "pipeline"
   script:
     - cd sausage-store-chart/helm-package
     - helm package sausage-store
@@ -33,6 +35,7 @@ sausage-store-argo-backend-sync:
   stage: deploy
   image: argoproj/argocd:v2.2.3
   extends: .prepare_env
+  dependencies: sausage-store-helm-upload
   script:
     argocd --grpc-web --auth-token $ARGO_TOKEN --server argocd.k8s.praktikum-services.tech app set sausage-store-gaydukov -p backend.image.tag=${IMAGE_TAG}
     argocd --grpc-web --auth-token $ARGO_TOKEN --server argocd.k8s.praktikum-services.tech app sync sausage-store-gaydukov
@@ -41,6 +44,7 @@ sausage-store-argo-frontend-sync:
   stage: deploy
   image: argoproj/argocd:v2.2.3
   extends: .prepare_env
+  dependencies: sausage-store-helm-upload
   script:
     argocd --grpc-web --auth-token $ARGO_TOKEN --server argocd.k8s.praktikum-services.tech app set sausage-store-gaydukov -p backend.image.tag=${IMAGE_TAG}
     argocd --grpc-web --auth-token $ARGO_TOKEN --server argocd.k8s.praktikum-services.tech app sync sausage-store-gaydukov
@@ -49,6 +53,7 @@ sausage-store-argo-backend-report-sync:
   stage: deploy
   image: argoproj/argocd:v2.2.3
   extends: .prepare_env
-  edcript:
+  dependencies: sausage-store-helm-upload
+  script:
     argocd --grpc-web --auth-token $ARGO_TOKEN --server argocd.k8s.praktikum-services.tech app set sausage-store-gaydukov -p backend-report.image.tag=${IMAGE_TAG}
     argocd --grpc-web --auth-token $ARGO_TOKEN --server argocd.k8s.praktikum-services.tech app sync sausage-store-gaydukov
