@@ -49,7 +49,7 @@ sausage-store-argo-frontend-sync:
   dependencies:
     - sausage-store-helm-upload
   script:
-    - argocd --grpc-web --auth-token $ARGO_TOKEN --server argocd.k8s.praktikum-services.tech app set sausage-store-gaydukov -p backend.image.tag=$IMAGE_TAG
+    - argocd --grpc-web --auth-token $ARGO_TOKEN --server argocd.k8s.praktikum-services.tech app set sausage-store-gaydukov -p frontend.image.tag=$IMAGE_TAG
     - argocd --grpc-web --auth-token $ARGO_TOKEN --server argocd.k8s.praktikum-services.tech app sync sausage-store-gaydukov
 
 sausage-store-argo-backend-report-sync:
