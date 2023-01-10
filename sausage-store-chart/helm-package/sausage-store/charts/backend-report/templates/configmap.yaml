@@ -1,0 +1,7 @@
+apiVersion: v1
+data:
+  DB: {{ .Values.db_uri }}
+  PORT: "{{ .Values.db_port }}"
+kind: ConfigMap
+metadata:
+  name: backend-report-config

@@ -5,21 +5,36 @@
   before_script:
     - mkdir -p ~/.kube
     - echo -n "${CONFIG}"|base64 -d>~/.kube/config
-    - kubectl config get-contexts
-    - cd kubernetes
 
 stages:
+  - build
+  - upload
   - deploy
 
-sausage-store-k8s-deploy:
+sausage-store-helm-build:
+  stage: build
+  image: alpine/helm
+  script:
+    - cd sausage-store-chart/helm-package
+    - helm package sausage-store
+  artifacts:
+    untracked: true
+
+sausage-store-helm-upload:
+  stage: upload
+  image: alpine/curl
+  dependencies:
+    - sausage-store-helm-build
+  script:
+    - cd sausage-store-chart/helm-package
+    - find . -maxdepth 1 -iname '*.tgz' -exec curl -u '${NEXUS_USER}:${NEXUS_PASS}'  http://nexus.praktikum-services.ru/repository/08-gaydukov-helm/ --upload-file '{}' \;   
+
+sausage-store-helm-deploy:
   stage: deploy
-  image: bitnami/kubectl:latest
+  image: alpine/helm
   extends: .prepare_env
   script:
-    - kubectl apply -f backend-report
-    - kubectl apply -f backend
-    - kubectl apply -f frontend
-  only:
-    changes:
-      - kubernetes/**/*
+    - helm repo add nexus ${NEXUS_URI} --username ${NEXUS_USER} --password ${NEXUS_PASS}
+    - helm repo update nexus
+    - helm upgrade --install sausage-store --atomic --timeout 15m nexus/sausage-store
 

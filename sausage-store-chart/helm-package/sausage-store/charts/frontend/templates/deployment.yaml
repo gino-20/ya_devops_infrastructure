@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: frontend
   labels: 
-    app: frontend
+{{ toYaml .Values.labels | indent 4 }}
 spec:
   revisionHistoryLimit: 15
   replicas: 1
@@ -18,12 +18,12 @@ spec:
         app: frontend
     spec:
       containers:
-      - image: gitlab.praktikum-services.ru:5050/a.gaydukov/sausage-store/sausage-frontend:kuber
+      - image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         name: frontend
         imagePullPolicy: IfNotPresent
         ports:
           - name: frontend
-            containerPort: 8080
+            containerPort: {{ .Values.container_port }}
         volumeMounts:
           - name: frontend-config
             mountPath: /etc/nginx/conf.d/default.conf
@@ -31,7 +31,7 @@ spec:
         livenessProbe:
           httpGet:
             path: /
-            port: 8080
+            port: {{ .Values.container_port }}
           initialDelaySeconds: 15
           periodSeconds: 30
           timeoutSeconds: 2
@@ -43,12 +43,4 @@ spec:
       imagePullSecrets:
         - name: docker-config-secret
       affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: app
-                operator: In
-                values:
-                - frontend
-
+{{ toYaml .Values.affinity | indent 8 }}
