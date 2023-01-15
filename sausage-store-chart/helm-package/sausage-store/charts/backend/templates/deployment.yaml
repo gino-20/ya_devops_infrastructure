@@ -19,6 +19,10 @@ spec:
     metadata:
       labels:
         app: backend
+      annotations:
+        prometheus.io/path: /actuator/prometheus
+        prometheus.io/port: "8080"
+        prometheus.io/scrape: "true"
     spec:
       containers:
       - image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
