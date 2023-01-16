@@ -8,7 +8,7 @@ labels:
   meta.helm.sh/release-name: sausage-store
   meta.helm.sh/release-namespace: 08-a-gaydukov
 
-version: 0.1.0
+version: 0.1.1
 appVersion: "latest"
 
 dependencies:
