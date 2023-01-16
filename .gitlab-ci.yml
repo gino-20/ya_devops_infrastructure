@@ -21,8 +21,8 @@ sausage-store-helm-build:
   script:
     - echo $IMAGE_TAG
     - cd sausage-store-chart/helm-package
-    - echo {$CI_PIPELINE_IID}
-    - helm package sausage-store --version 0.1.2
+    - echo $CI_PIPELINE_IID
+    - helm package sausage-store --version 0.1.$CI_PIPELINE_IID
   artifacts:
     untracked: true
 
@@ -34,7 +34,7 @@ sausage-store-helm-upload:
   script:
     - cd sausage-store-chart/helm-package
     - ls -lah
-    - find . -maxdepth 1 -iname '*.tgz' -exec curl -v -u '${NEXUS_USER}:${NEXUS_PASS}'  http://nexus.praktikum-services.ru/repository/08-gaydukov-helm/ --upload-file '{}' \;   
+    - find . -maxdepth 1 -iname '*.tgz' -exec curl -v -u "$NEXUS_USER:$NEXUS_PASS"  http://nexus.praktikum-services.ru/repository/08-gaydukov-helm/ --upload-file '{}' \;   
   rules:
     - if: $CI_PIPELINE_SOURCE == "pipeline"
 
