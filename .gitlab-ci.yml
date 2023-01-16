@@ -22,7 +22,7 @@ sausage-store-helm-build:
     - echo $IMAGE_TAG
     - cd sausage-store-chart/helm-package
     - echo {$CI_PIPELINE_IID}
-    - helm package sausage-store --version 0.1.{$CI_PIPELINE_IID}
+    - helm package sausage-store --version 0.1.2
   artifacts:
     untracked: true
 
