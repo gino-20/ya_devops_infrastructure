@@ -47,8 +47,7 @@ sausage-store-argo-backend-sync:
   script:
     - argocd --grpc-web --auth-token $ARGO_TOKEN --server argocd.k8s.praktikum-services.tech app set sausage-store-gaydukov -p backend.image.tag=$IMAGE_TAG
     - argocd --grpc-web --auth-token $ARGO_TOKEN --server argocd.k8s.praktikum-services.tech app sync sausage-store-gaydukov
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "pipeline"
+  when: manual
 
 sausage-store-argo-frontend-sync:
   stage: deploy-frontend
@@ -59,8 +58,7 @@ sausage-store-argo-frontend-sync:
   script:
     - argocd --grpc-web --auth-token $ARGO_TOKEN --server argocd.k8s.praktikum-services.tech app set sausage-store-gaydukov -p frontend.image.tag=$IMAGE_TAG
     - argocd --grpc-web --auth-token $ARGO_TOKEN --server argocd.k8s.praktikum-services.tech app sync sausage-store-gaydukov
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "pipeline"
+  when: manual
 
 sausage-store-argo-backend-report-sync:
   stage: deploy-backend-report
@@ -71,5 +69,4 @@ sausage-store-argo-backend-report-sync:
   script:
     - argocd --grpc-web --auth-token $ARGO_TOKEN --server argocd.k8s.praktikum-services.tech app set sausage-store-gaydukov -p backend-report.image.tag=$IMAGE_TAG
     - argocd --grpc-web --auth-token $ARGO_TOKEN --server argocd.k8s.praktikum-services.tech app sync sausage-store-gaydukov
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "pipeline"
+  when: manual
