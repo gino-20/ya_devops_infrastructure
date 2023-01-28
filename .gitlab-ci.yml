@@ -9,14 +9,20 @@
 stages:
   - build
   - upload
-  - deploy
+  - deploy-backend
+  - deploy-frontend
+  - deploy-backend-report
 
 sausage-store-helm-build:
   stage: build
   image: alpine/helm
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "pipeline"
   script:
+    - echo $IMAGE_TAG
     - cd sausage-store-chart/helm-package
-    - helm package sausage-store
+    - echo $CI_PIPELINE_IID
+    - helm package sausage-store --version 0.1.$CI_PIPELINE_IID
   artifacts:
     untracked: true
 
@@ -27,14 +33,40 @@ sausage-store-helm-upload:
     - sausage-store-helm-build
   script:
     - cd sausage-store-chart/helm-package
-    - find . -maxdepth 1 -iname '*.tgz' -exec curl -u '${NEXUS_USER}:${NEXUS_PASS}'  http://nexus.praktikum-services.ru/repository/08-gaydukov-helm/ --upload-file '{}' \;   
+    - ls -lah
+    - find . -maxdepth 1 -iname '*.tgz' -exec curl -v -u "$NEXUS_USER:$NEXUS_PASS"  http://nexus.praktikum-services.ru/repository/08-gaydukov-helm/ --upload-file '{}' \;   
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "pipeline"
 
-sausage-store-helm-deploy:
-  stage: deploy
-  image: alpine/helm
+sausage-store-argo-backend-sync:
+  stage: deploy-backend
+  image: argoproj/argocd:v2.2.3
   extends: .prepare_env
+  dependencies:
+    - sausage-store-helm-upload
   script:
-    - helm repo add nexus ${NEXUS_URI} --username ${NEXUS_USER} --password ${NEXUS_PASS}
-    - helm repo update nexus
-    - helm upgrade --install sausage-store --atomic --timeout 15m nexus/sausage-store
+    - argocd --grpc-web --auth-token $ARGO_TOKEN --server argocd.k8s.praktikum-services.tech app set sausage-store-gaydukov -p backend.image.tag=$IMAGE_TAG
+    - argocd --grpc-web --auth-token $ARGO_TOKEN --server argocd.k8s.praktikum-services.tech app sync sausage-store-gaydukov
+  when: manual
 
+sausage-store-argo-frontend-sync:
+  stage: deploy-frontend
+  image: argoproj/argocd:v2.2.3
+  extends: .prepare_env
+  dependencies:
+    - sausage-store-helm-upload
+  script:
+    - argocd --grpc-web --auth-token $ARGO_TOKEN --server argocd.k8s.praktikum-services.tech app set sausage-store-gaydukov -p frontend.image.tag=$IMAGE_TAG
+    - argocd --grpc-web --auth-token $ARGO_TOKEN --server argocd.k8s.praktikum-services.tech app sync sausage-store-gaydukov
+  when: manual
+
+sausage-store-argo-backend-report-sync:
+  stage: deploy-backend-report
+  image: argoproj/argocd:v2.2.3
+  extends: .prepare_env
+  dependencies:
+    - sausage-store-helm-upload
+  script:
+    - argocd --grpc-web --auth-token $ARGO_TOKEN --server argocd.k8s.praktikum-services.tech app set sausage-store-gaydukov -p backend-report.image.tag=$IMAGE_TAG
+    - argocd --grpc-web --auth-token $ARGO_TOKEN --server argocd.k8s.praktikum-services.tech app sync sausage-store-gaydukov
+  when: manual
