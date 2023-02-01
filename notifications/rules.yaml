@@ -1,0 +1,41 @@
+---
+groups:
+  - name: Sausage store rules
+    rules:
+    - alert: PodInstanceDown
+      expr: absent(up{app="backend"})
+      for: 0m
+      labels:
+        severity: critical
+        project: "sausage-store-gaydukov-08"
+        component: "backend"
+      annotations:
+        description: "Backend POD is no more"
+        summary: "{{ $labels.instance }}"
+    - alert: Endpoint500Error
+      expr: sum_over_time(http_server_requests_seconds_count{status="500"}[1m]) > 0
+      for: 0m
+      labels:
+        severity: moderate
+        project: "sausage-store-gaydukov-08"
+        component: "frontend"
+      annotations:
+        description: "Error 500 connecting to endpoints"
+    - alert: ApiRequestDelayTooMuch
+      expr: histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{url="/api/orders", method="POST", status="200"}[5m])) by (le)) > 0.1
+      for: 5m
+      labels:
+        severity: warning
+        project: "sausage-store-gaydukov-08"
+        component: "frontend"
+      annotations:
+        description: "/api/orders requests taking too long"
+    - alert: PrometheusEndpointError
+      expr: sum_over_time(http_server_requests_seconds_count{status!~"200",uri="/actuator/prometheus"}[2m]) > 0
+      for: 0m
+      labels:
+        severity: critical
+        project: "sausage-store-gaydukov-08"
+        component: "backend"
+      annotations:
+        description: "/actuator/prometheus seems to be unreachable"
